@@ -1,9 +1,10 @@
 from config import DB_PATH
-from modules.bot import bot
+from modules.bot import bot, dispatcher
 from modules.video_uploading.repeats_search import check_repeated_videos_after_start
 from modules.logger import get_logger
 from db import db_session
 from time import sleep
+from aiogram import executor
 import threading
 import requests
 import urllib3
@@ -39,7 +40,7 @@ def start_bot():
     last_e = None
     while True:
         try:
-            bot.polling(none_stop=True, interval=0.1)
+            executor.start_polling(dispatcher)
         except requests.exceptions.ConnectionError as e:
             if e != last_e:
                 last_e = e
@@ -71,5 +72,6 @@ t1.start()
 t2.start()
 for thread in [t1, t2]:
     thread.join()
+
 tracemalloc.stop()
 logger.critical(f"Программа завершилась, т.к. вышла из цикла!!!")
