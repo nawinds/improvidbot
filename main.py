@@ -35,7 +35,6 @@ import modules.video_uploading.tags
 
 if __name__ == '__main__':
     db_session.global_init(DB_PATH)
-
     loop = asyncio.get_event_loop()
     loop.create_task(check_repeated_videos_after_start())
     executor.start_polling(dp, loop=loop)
