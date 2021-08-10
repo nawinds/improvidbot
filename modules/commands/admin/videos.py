@@ -1,5 +1,5 @@
 from config import ADMIN_ID
-from modules.bot import bot
+from modules.bot import bot, dp
 from modules.decorators import main_admin
 from modules.logger import get_logger
 from modules.text_func import normalize, get_text_variants
@@ -11,8 +11,8 @@ from db.video_actors import Actor
 admin_videos_logger = get_logger("admin_videos_commands")
 
 
-@bot.message_handler(commands=['get_user_videos'], func=lambda message: main_admin(message))
-def get_user_videos(message):
+@dp.message_handler(commands=['get_user_videos'], function=lambda message: main_admin(message))
+async def get_user_videos(message):
     try:
         user_id = message.text.split()[1]
     except (IndexError, ValueError):
@@ -31,13 +31,13 @@ def get_user_videos(message):
                                            f"{data}", parse_mode="html")
 
 
-@bot.message_handler(commands=["edit_title"], func=lambda message: main_admin(message))
-def edit_title_cmd(message):
+@dp.message_handler(commands=["edit_title"], function=lambda message: main_admin(message))
+async def edit_title_cmd(message):
     vid_id, title = message.text.split()[1], " ".join(message.text.split()[2:])
-    edit_title(vid_id, title)
+    await edit_title(vid_id, title)
 
 
-def edit_title(vid_id, title):
+async def edit_title(vid_id, title):
     s = db_session.create_session()
     video = s.query(Video).filter(Video.id == vid_id).first()
     if not video:
@@ -59,13 +59,13 @@ def edit_title(vid_id, title):
     admin_videos_logger.info(f"Название видео {video.id} сменено с {old} на {title}.")
 
 
-@bot.message_handler(commands=["edit_description"], func=lambda message: main_admin(message))
-def edit_description_cmd(message):
+@dp.message_handler(commands=["edit_description"], function=lambda message: main_admin(message))
+async def edit_description_cmd(message):
     vid_id, description = message.text.split()[1], " ".join(message.text.split()[2:])
-    edit_description(vid_id, description)
+    await edit_description(vid_id, description)
 
 
-def edit_description(vid_id, description):
+async def edit_description(vid_id, description):
     s = db_session.create_session()
     video = s.query(Video).filter(Video.id == vid_id).first()
     if not video:
@@ -87,13 +87,13 @@ def edit_description(vid_id, description):
     admin_videos_logger.info(f"Описание видео {video.id} сменено с {old} на {description}.")
 
 
-@bot.message_handler(commands=["edit_actors"], func=lambda message: main_admin(message))
-def edit_actors_cmd(message):
+@dp.message_handler(commands=["edit_actors"], function=lambda message: main_admin(message))
+async def edit_actors_cmd(message):
     vid_id, actors = message.text.split()[1], " ".join(message.text.split()[2:]).split(", ")
-    edit_actors(vid_id, actors)
+    await edit_actors(vid_id, actors)
 
 
-def edit_actors(vid_id, actors):
+async def edit_actors(vid_id, actors):
     s = db_session.create_session()
     video = s.query(Video).filter(Video.id == vid_id).first()
     if not video:
@@ -125,28 +125,28 @@ def edit_actors(vid_id, actors):
     admin_videos_logger.info(f"Актеры видео {video.id} обновлены с {old} на {actors}.")
 
 
-@bot.message_handler(commands=["delete_tag"], func=lambda message: main_admin(message))
-def del_tag_cmd(message):
+@dp.message_handler(commands=["delete_tag"], function=lambda message: main_admin(message))
+async def del_tag_cmd(message):
     vid_id, tag = message.text.split()[1], " ".join(message.text.split()[2:])
-    del_tag(vid_id, tag)
+    await del_tag(vid_id, tag)
 
 
-@bot.message_handler(commands=["delete_all_tags"], func=lambda message: main_admin(message))
-def del_all_tags_cmd(message):
+@dp.message_handler(commands=["delete_all_tags"], function=lambda message: main_admin(message))
+async def del_all_tags_cmd(message):
     vid_id = message.text.split()[1]
-    del_all_tags(vid_id)
+    await del_all_tags(vid_id)
 
 
-def del_all_tags(vid_id):
+async def del_all_tags(vid_id):
     s = db_session.create_session()
     tags = s.query(Tag).filter(Tag.video_id == vid_id).all()
     for tag in tags:
-        del_tag(vid_id, tag.tag, True)
+        await del_tag(vid_id, tag.tag, True)
     bot.send_message(ADMIN_ID, "Все теги удалены!")
     admin_videos_logger.info(f"Все теги видео {vid_id} удалены")
 
 
-def del_tag(vid_id, tag, del_all=False):
+async def del_tag(vid_id, tag, del_all=False):
     s = db_session.create_session()
     video = s.query(Video).filter(Video.id == vid_id).first()
     if not video:
@@ -166,13 +166,13 @@ def del_tag(vid_id, tag, del_all=False):
         admin_videos_logger.info(f"Тег {tag} видео {video.id} удалён")
 
 
-@bot.message_handler(commands=["add_tag"], func=lambda message: main_admin(message))
-def add_tag_cmd(message):
+@dp.message_handler(commands=["add_tag"], function=lambda message: main_admin(message))
+async def add_tag_cmd(message):
     vid_id, tag = message.text.split()[1], " ".join(message.text.split()[2:])
-    add_tag(vid_id, tag)
+    await add_tag(vid_id, tag)
 
 
-def add_tag(vid_id, tag):
+async def add_tag(vid_id, tag):
     s = db_session.create_session()
     video = s.query(Video).filter(Video.id == vid_id).first()
     if not video:

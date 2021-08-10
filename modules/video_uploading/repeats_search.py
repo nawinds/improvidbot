@@ -15,20 +15,20 @@ import imagehash
 logger = get_logger("repeats_search")
 
 
-def check_repeats(video, checking=1):
+async def check_repeats(video, checking=1):
     logger.info(f"CHECKING REPEATS FOR {video.id}")
     os.mkdir(f"{config.LOCAL_PATH}/videos/{video.id}")
     res = open(f"{config.LOCAL_PATH}/videos/{video.id}/res.txt", "w")
     res.close()
     # download uploaded video
-    v = bot.get_file(video.url)
-    downloaded_file = bot.download_file(v.file_path)
+    v = await bot.get_file(video.url)
+    downloaded_file = await bot.download_file(v.file_path)
     new = f"{config.LOCAL_PATH}/videos/{video.id}/{video.id}.mp4"
     with open(new, 'wb') as new_file:
         new_file.write(downloaded_file)
 
     os.mkdir(f"{config.LOCAL_PATH}/videos/{video.id}/frames{video.id}")
-    frame_hashes = hashes_get(video, video)
+    frame_hashes = await hashes_get(video, video)
     os.remove(f"{config.LOCAL_PATH}/videos/{video.id}/{video.id}.mp4")
 
     session = db_session.create_session()
@@ -36,13 +36,13 @@ def check_repeats(video, checking=1):
                                          Video.id >= checking).all()
     for vid in range(len(videos)):
         os.mkdir(f"{config.LOCAL_PATH}/videos/{video.id}/frames{videos[vid].id}")
-        v = bot.get_file(videos[vid].url)
-        downloaded_file = bot.download_file(v.file_path)
+        v = await bot.get_file(videos[vid].url)
+        downloaded_file = await bot.download_file(v.file_path)
         new = f"{config.LOCAL_PATH}/videos/{video.id}/{videos[vid].id}.mp4"
         with open(new, 'wb') as new_file:
             new_file.write(downloaded_file)
 
-        frame_hashes2 = hashes_get(videos[vid], video)
+        frame_hashes2 = await hashes_get(videos[vid], video)
         os.remove(f"{config.LOCAL_PATH}/videos/{video.id}/{videos[vid].id}.mp4")
         cnt = 0
         for a in range(len(frame_hashes2)):
@@ -61,7 +61,7 @@ def check_repeats(video, checking=1):
     return rep
 
 
-def hashes_get(video, uploaded):
+async def hashes_get(video, uploaded):
     frame_hashes = []
     vidcap = cv2.VideoCapture(f"{config.LOCAL_PATH}/videos/{uploaded.id}/{video.id}.mp4")
     success, image = vidcap.read()
@@ -80,7 +80,7 @@ def hashes_get(video, uploaded):
     return frame_hashes
 
 
-def check_repeated_videos_after_start():
+async def check_repeated_videos_after_start():
     last_e = None
     while True:
         try:
@@ -104,17 +104,17 @@ def check_repeated_videos_after_start():
                 shutil.rmtree(f"{config.LOCAL_PATH}/videos/{v}")
                 sleep(0.5)
                 if video:
-                    rep = check_repeats(video, vi)
+                    rep = await check_repeats(video, vi)
                     if rep:
                         logger.warn(f"Видео {video.id} содержит кадры из "
                                     f"видео {', '.join([str(i.id) for i in rep])}!")
-                        bot.send_message(config.ADMIN_ID, f"Видео {video.id} содержит кадры из "
+                        await bot.send_message(config.ADMIN_ID, f"Видео {video.id} содержит кадры из "
                                                           f"видео {', '.join([str(i.id) for i in rep])}!")
-                        bot.send_video(config.ADMIN_ID, video.url, caption=str(video.id))
+                        await bot.send_video(config.ADMIN_ID, video.url, caption=str(video.id))
                         for i in rep:
-                            bot.send_video(config.ADMIN_ID, i.url, caption=str(i.id))
+                            await bot.send_video(config.ADMIN_ID, i.url, caption=str(i.id))
                     else:
-                        bot.send_message(config.ADMIN_ID, f"Видео {video.id} проверено, повторов нет")
+                        await bot.send_message(config.ADMIN_ID, f"Видео {video.id} проверено, повторов нет")
                         logger.info(f"Видео {video.id} проверено, повторов нет")
                 else:
                     logger.warn("При запуске бота, обнаружена папка для проверки видео, которого нет в базе.")

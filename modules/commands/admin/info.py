@@ -1,6 +1,6 @@
 from config import ADMIN_ID
 import config
-from modules.bot import bot
+from modules.bot import bot, dp
 from modules.logger import get_logger
 from modules.decorators import main_admin
 from db import db_session
@@ -13,8 +13,8 @@ import tracemalloc
 admin_info = get_logger("admin_info_commands")
 
 
-@bot.message_handler(commands=["memory"], func=lambda m: main_admin(m))
-def memory(message):
+@dp.message_handler(commands=["memory"], function=lambda m: main_admin(m))
+async def memory(message):
     current, peak = tracemalloc.get_traced_memory()
     bot.send_message(ADMIN_ID, f"Current memory usage is "
                                f"{current / 10 ** 3}KB; "
@@ -22,8 +22,8 @@ def memory(message):
                                f"Diff = {(peak - current) / 10 ** 3}KB")
 
 
-@bot.message_handler(commands=["stats"], func=lambda m: main_admin(m))
-def stats(message):
+@dp.message_handler(commands=["stats"], function=lambda m: main_admin(m))
+async def stats(message):
     session = db_session.create_session()
     len_users = session.query(User).count()
     len_videos = session.query(Video).count()
@@ -46,8 +46,8 @@ def stats(message):
                                f"Средний номер выбранного видео: {average_q_res}")
 
 
-@bot.message_handler(commands=['logs'], func=lambda message: main_admin(message))
-def logs(message):
+@dp.message_handler(commands=['logs'], function=lambda message: main_admin(message))
+async def logs(message):
     bot.reply_to(message, "Готовлю файл с логами...")
     args = message.text.split()
     filename = f"{args[1]}.log" if len(args) > 1 else "main.log"
@@ -65,8 +65,8 @@ def logs(message):
     admin_info.info("LOGS EXPORTED")
 
 
-@bot.message_handler(commands=['db'], func=lambda message: main_admin(message))
-def get_db(message):
+@dp.message_handler(commands=['db'], function=lambda message: main_admin(message))
+async def get_db(message):
     bot.send_message(ADMIN_ID, "Готовлю файл с БД...")
     filename = f"{config.LOCAL_PATH}//db/main.db"
     with open(filename, "rb") as file:

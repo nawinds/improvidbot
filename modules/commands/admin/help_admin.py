@@ -1,9 +1,9 @@
-from modules.bot import bot
+from modules.bot import bot, dp
 from modules.decorators import main_admin
 
 
-@bot.message_handler(commands=["help"], func=lambda message: main_admin(message))
-def help_admin(message):
+@dp.message_handler(commands=["help"], function=lambda message: main_admin(message))
+async def help_admin(message):
     text = f"<b>ОБЩИЕ:</b>\n" \
            f"<b>/search q</b> — Поиск видео, где q — поисковый запрос\n" \
            f"<b>/top</b> — Топ активных пользователей\n" \

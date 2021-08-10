@@ -1,5 +1,5 @@
 from config import ADMIN_ID
-from modules.bot import bot
+from modules.bot import bot, dp
 from modules.logger import get_logger
 from modules.decorators import main_admin
 from modules.scores import add_score
@@ -9,8 +9,8 @@ from db.users import User
 admin_users_logger = get_logger("admin_users_commands")
 
 
-@bot.message_handler(commands=["all_admins"], func=lambda message: main_admin(message))
-def all_admins(message):
+@dp.message_handler(commands=["all_admins"], function=lambda message: main_admin(message))
+async def all_admins(message):
     session = db_session.create_session()
     admins = session.query(User).filter(User.is_admin == True).all()
     data = '\n\n'.join([f'@{bot.get_chat(admin.tg_id).username}\n'
@@ -24,8 +24,8 @@ def all_admins(message):
     bot.send_message(ADMIN_ID, text)
 
 
-@bot.message_handler(commands=["ban_admin"], func=lambda message: main_admin(message))
-def ban_admin(message):
+@dp.message_handler(commands=["ban_admin"], function=lambda message: main_admin(message))
+async def ban_admin(message):
     try:
         admin_id = str(int(message.text.split()[1]))
     except (IndexError, ValueError):
@@ -44,8 +44,8 @@ def ban_admin(message):
     bot.send_message(ADMIN_ID, "Админ больше не админ...")
 
 
-@bot.message_handler(commands=['find_user'], func=lambda message: main_admin(message))
-def find_user(message):
+@dp.message_handler(commands=['find_user'], function=lambda message: main_admin(message))
+async def find_user(message):
     try:
         user = message.text.split()[1]
     except IndexError:
@@ -75,8 +75,8 @@ def find_user(message):
     bot.send_message(ADMIN_ID, bot.get_chat(user_db.tg_id))
 
 
-@bot.message_handler(commands=['send'], func=lambda message: main_admin(message))
-def send(message):
+@dp.message_handler(commands=['send'], function=lambda message: main_admin(message))
+async def send(message):
     try:
         receiver = str(int(message.text.split()[1]))
         message = " ".join(message.text.split()[2:])
@@ -100,8 +100,8 @@ def send(message):
     admin_users_logger.info(f"Сообщение успешно отправлено {receiver}! msg: {message}")
 
 
-@bot.message_handler(commands=['add_score'], func=lambda message: main_admin(message))
-def add_score_cmd(message):
+@dp.message_handler(commands=['add_score'], function=lambda message: main_admin(message))
+async def add_score_cmd(message):
     try:
         user_id, value = message.text.split()[1], int(message.text.split()[2])
     except (IndexError, ValueError):

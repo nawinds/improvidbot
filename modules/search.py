@@ -1,6 +1,6 @@
 from modules.logger import get_logger
 from modules.text_func import get_text_variants
-from modules.bot import bot
+from modules.bot import bot, dp
 from modules.scores import add_score
 from db import db_session
 from db.videos import Video
@@ -92,8 +92,8 @@ def find_result(q, results):
     return results
 
 
-@bot.inline_handler(func=lambda query: True)
-def query_text(inline_query):
+@dp.inline_handler(function=lambda query: True)
+async def query_text(inline_query):
     session = db_session.create_session()
     all_queries = session.query(Stats).filter(Stats.title == "all_queries").first()
     all_queries.value = str(int(all_queries.value) + 1)
@@ -123,10 +123,10 @@ def query_text(inline_query):
         session.commit()
         logger.warn(f"По поисковому запросу \"{inline_query.query}\" пользователя "
                     f"{inline_query.from_user.id} ничего не нашлось")
-    bot.answer_inline_query(inline_query.id, out, cache_time=10)
+    await bot.answer_inline_query(inline_query.id, out, cache_time=10)
 
 
-@bot.chosen_inline_handler(func=lambda chosen_inline_result: True)
+@dp.chosen_inline_handler(function=lambda chosen_inline_result: True)
 def test_chosen(chosen_inline_result):
     logger.debug(f"Пользователь {chosen_inline_result.from_user.id} выбрал видео "
                  f"id {chosen_inline_result.result_id} по инлайн-запросу {chosen_inline_result.query}")

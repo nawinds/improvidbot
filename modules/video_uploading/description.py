@@ -1,5 +1,5 @@
 from config import ACTORS
-from modules.bot import bot
+from modules.bot import bot, dp
 from modules.logger import get_logger
 from modules.text_func import get_text_variants
 from modules.states import get_state, change_state
@@ -7,14 +7,14 @@ from db.states import NEW_VIDEO_DESCRIPTION_STATE, NEW_VIDEO_ACTORS_STATE
 from db import db_session
 from db.videos import Video
 from db.tags import Tag
-from telebot.types import ForceReply, ReplyKeyboardMarkup
+from aiogram.types import ForceReply, ReplyKeyboardMarkup
 
 logger = get_logger("new_video_description")
 text_field = ForceReply(selective=False)
 
 
-@bot.message_handler(func=lambda message: get_state(message) == NEW_VIDEO_DESCRIPTION_STATE)
-def new_video_description(message):
+@dp.message_handler(function=lambda message: get_state(message) == NEW_VIDEO_DESCRIPTION_STATE)
+async def new_video_description(message):
     description = message.text
     if description != "" and len(description) <= 5000:
         session = db_session.create_session()
@@ -35,7 +35,7 @@ def new_video_description(message):
                 session.commit()
         markup = ReplyKeyboardMarkup()
         markup.add(*ACTORS + ["Всё"])
-        bot.send_message(message.from_user.id, "Если в видео фигурируют <b>конкретные личности, актёры</b>, "
+        await bot.send_message(message.from_user.id, "Если в видео фигурируют <b>конкретные личности, актёры</b>, "
                                                "нажимайте на <b>кнопки с их именами</b>.\n"
                                                "Если их нет на кнопках, введите полное имя и фамилию. "
                                                "<b>Один человек — одно сообщение</b>.\n\n"
@@ -49,7 +49,7 @@ def new_video_description(message):
                          reply_markup=markup, parse_mode="html", disable_web_page_preview=True)
         change_state(message, NEW_VIDEO_ACTORS_STATE)
     elif description != "":
-        bot.send_message(message.from_user.id, "Слишком длинное описание (более 5000 символов). "
+        await bot.send_message(message.from_user.id, "Слишком длинное описание (более 5000 символов). "
                                                "Пожалуйста, попробуйте что-то покороче.\n\n"
                                                "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
                                                "i-uvelichivat-ih-prosmotry-07-03\">"
@@ -59,7 +59,7 @@ def new_video_description(message):
         logger.info("Слишком длинное описание")
         return
     else:
-        bot.send_message(message.from_user.id, "Вы ничего не написали. Пожалуйста, придумайте описание\n\n"
+        await bot.send_message(message.from_user.id, "Вы ничего не написали. Пожалуйста, придумайте описание\n\n"
                                                "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
                                                "i-uvelichivat-ih-prosmotry-07-03\">"
                                                "Советы по оформлению ролика</a>\n"
