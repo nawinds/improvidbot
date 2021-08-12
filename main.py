@@ -38,4 +38,4 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     executor.start_polling(dp, loop=loop)
 
-    logger.critical(f"Программа завершилась, т.к. вышла из цикла!!!")
+    logger.critical("Программа завершилась, т.к. вышла из цикла!!!")
