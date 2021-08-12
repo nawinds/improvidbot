@@ -44,10 +44,19 @@ async def logs(message):
     filename = "main.log"
     # first = int(args[2]) if len(args) > 2 else 0
     # last = int(args[3]) if len(args) > 3 else None
-    if not os.path.exists(f"{config.LOCAL_PATH}//temp"):
-        os.mkdir(f"{config.LOCAL_PATH}//temp")
+    if not os.path.exists(f"{config.LOCAL_PATH}/temp"):
+        os.mkdir(f"{config.LOCAL_PATH}/temp")
+
     with open(f"{config.LOCAL_PATH}/logs/{filename}", "r", encoding="utf-8") as data:
         with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "w", encoding="utf-8") as temp_file:
+            temp_file.write(data.read())
+    with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "rb") as file:
+        await bot.send_document(ADMIN_ID, document=file)
+    os.remove(f"{config.LOCAL_PATH}/temp/{filename}.txt")
+
+    filename = "aiogram.log"
+    with open(f"{config.LOCAL_PATH}/logs/{filename}", "r") as data:
+        with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "w") as temp_file:
             temp_file.write(data.read())
     with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "rb") as file:
         await bot.send_document(ADMIN_ID, document=file)

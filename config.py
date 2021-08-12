@@ -8,6 +8,7 @@ LOGGER_TOKEN = os.getenv("LOGGER_TOKEN")
 LOCAL_PATH = os.getenv("LOCAL_PATH")
 DB_PATH = f"{LOCAL_PATH}/db/main.db"
 LOGS_PATH = f"{LOCAL_PATH}/logs/main.log"
+AIOGRAM_LOGS_PATH = f"{LOCAL_PATH}/logs/aiogram.log"
 ACTORS = ["Антон Шастун", "Арсений Попов", "Сергей Матвиенко", "Дмитрий Позов",
           "Павел Воля", "Станислав Шеминов", "Оксана Суркова"]
 ALIASES = {"Антон Шастун": ["Шастун", "Шаст", "Антон", "Тоша", "Антоха", "Артон", "Артоны", "Антох",
