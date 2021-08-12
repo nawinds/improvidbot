@@ -16,7 +16,7 @@ class LoggerFH(logging.FileHandler):
             msg = self.format(record)
             msg = msg.split("\"")
             for part in range(len(msg)):
-                if msg[part].startswith("C:\\Users"):
+                if msg[part].startswith("/home"):
                     msg[part] = f"<u>{msg[part]}</u>"
             msg = "\"".join(msg)
             t0 = time.time()
