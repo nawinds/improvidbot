@@ -32,30 +32,35 @@ async def new_video_title(message):
                 session.add(Tag(tag=tag, added_id=message.from_user.id, video_id=video.id,
                                 coef=len(tag.split()) * 6))
                 session.commit()
-        await bot.send_message(message.from_user.id, "Придумайте <b>описание</b>\n\n"
-                                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Придумайте <b>описание</b>\n\n"
+                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               reply_markup=text_field, parse_mode="html",
+                               disable_web_page_preview=True)
         change_state(message, NEW_VIDEO_DESCRIPTION_STATE)
     elif title:
-        await bot.send_message(message.from_user.id, "Слишком длинное название (более 100 символов). "
-                                               "Пожалуйста, попробуйте что-то покороче. Так видео "
-                                               "будет легче искать.\n\n"
-                                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Слишком длинное название (более 100 символов). "
+                               "Пожалуйста, попробуйте что-то покороче. Так видео "
+                               "будет легче искать.\n\n"
+                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
         logger.info("Слишком длинное название")
         return
     else:
-        await bot.send_message(message.from_user.id, "Вы ничего не написали. Пожалуйста, выберите, "
-                                               "как назвать видео\n\n"
-                                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Вы ничего не написали. Пожалуйста, выберите, "
+                               "как назвать видео\n\n"
+                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               reply_markup=text_field, parse_mode="html",
+                               disable_web_page_preview=True)
         logger.info("Название не указано")

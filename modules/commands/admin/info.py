@@ -25,15 +25,16 @@ async def stats(message):
     chosen_queries = session.query(Stats).filter(Stats.title == "chosen_queries").first().value
     no_res_queries = session.query(Stats).filter(Stats.title == "no_res_queries").first().value
     average_q_res = session.query(Stats).filter(Stats.title == "average_q_res").first().value
-    await bot.send_message(ADMIN_ID, f"Пользователей: {len_users}\n"
-                               f"Всего видео: {len_videos}\n"
-                               f"Активных видео: {len_active_videos}\n"
-                               f"Загружавших видео: {len_uploaders}\n"
-                               f"Админов: {len_admins}\n"
-                               f"Всего поисковых запросов: {all_queries}\n"
-                               f"Выбранных в поиске видео: {chosen_queries}\n"
-                               f"Запросов без результатов: {no_res_queries}\n"
-                               f"Средний номер выбранного видео: {average_q_res}")
+    await bot.send_message(ADMIN_ID,
+                           f"Пользователей: {len_users}\n"
+                           f"Всего видео: {len_videos}\n"
+                           f"Активных видео: {len_active_videos}\n"
+                           f"Загружавших видео: {len_uploaders}\n"
+                           f"Админов: {len_admins}\n"
+                           f"Всего поисковых запросов: {all_queries}\n"
+                           f"Выбранных в поиске видео: {chosen_queries}\n"
+                           f"Запросов без результатов: {no_res_queries}\n"
+                           f"Средний номер выбранного видео: {average_q_res}")
 
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=['logs'])
@@ -45,8 +46,8 @@ async def logs(message):
     # last = int(args[3]) if len(args) > 3 else None
     if not os.path.exists(f"{config.LOCAL_PATH}//temp"):
         os.mkdir(f"{config.LOCAL_PATH}//temp")
-    with open(f"{config.LOCAL_PATH}/logs/{filename}", "r") as data:
-        with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "w") as temp_file:
+    with open(f"{config.LOCAL_PATH}/logs/{filename}", "r", encoding="utf-8") as data:
+        with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "w", encoding="utf-8") as temp_file:
             temp_file.write(data.read())
     with open(f"{config.LOCAL_PATH}/temp/{filename}.txt", "rb") as file:
         await bot.send_document(ADMIN_ID, document=file)

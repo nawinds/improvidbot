@@ -1,3 +1,4 @@
+#!/home/pi/venvs/improvidbot/bin/python3
 from config import DB_PATH
 from modules.bot import dp
 from modules.logger import get_logger

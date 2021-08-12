@@ -117,7 +117,7 @@ async def query_text(inline_query):
                 break
         if count == 45:
             break
-    logger.debug(f"Поиск видео по запросу {inline_query.query} занял {time.time() - start} секунд")
+    logger.info(f"Поиск видео по запросу {inline_query.query} занял {time.time() - start} секунд")
     if not out:
         no_res_queries = session.query(Stats).filter(Stats.title == "no_res_queries").first()
         no_res_queries.value = str(int(no_res_queries.value) + 1)

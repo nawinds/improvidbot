@@ -26,8 +26,9 @@ async def new_pr_code(message):
     session.add(Code(code=code, type=2))
     session.commit()
     code_db = session.query(Code).filter(Code.code == code, Code.type == 2).first()
-    await bot.send_message(ADMIN_ID, f"Новый пригласительный код с id: {code_db.id}. "
-                               f"Придумайте ему название: {code_db.id}. Название")
+    await bot.send_message(ADMIN_ID,
+                           f"Новый пригласительный код с id: {code_db.id}. "
+                           f"Придумайте ему название: {code_db.id}. Название")
     pr_codes_logger.info(f"Новый pr-код с id: {code_db.id}")
     change_state(message, NEW_PR_CODE_TITLE_STATE)
 

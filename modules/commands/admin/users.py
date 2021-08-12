@@ -49,8 +49,9 @@ async def find_user(message):
     try:
         user = message.text.split()[1]
     except IndexError:
-        await bot.send_message(ADMIN_ID, "Пожалуйста, укажите получателя в формате: /find_user @username или "
-                                   "/find_user tg_id")
+        await bot.send_message(ADMIN_ID,
+                               "Пожалуйста, укажите получателя в формате: /find_user @username или "
+                               "/find_user tg_id")
         admin_users_logger.info("Пожалуйста, укажите получателя в формате: /find_user @username или "
                                 "/find_user tg_id")
         return
@@ -63,41 +64,54 @@ async def find_user(message):
         await bot.send_message(ADMIN_ID, "Пользователь не найден в базе!")
         admin_users_logger.info("Пользователь не найден в базе! Команда /find_user")
         return
-    await bot.send_message(ADMIN_ID, f"Пользователь найден! <b>@{(await bot.get_chat(user_db.tg_id)).username} "
-                               f"(<code>{user_db.tg_id}</code>)</b>\n"
-                               f"name: {(await bot.get_chat(user_db.tg_id)).first_name}\n"
-                               f"surname: {(await bot.get_chat(user_db.tg_id)).last_name}\n"
-                               f"bio: {(await bot.get_chat(user_db.tg_id)).bio}\n"
-                               f"is admin: <b>{user_db.is_admin}</b>\n"
-                               f"code id: <b>{user_db.code_id}</b>\n"
-                               f"score: <b>{user_db.score}</b>\n"
-                               f"joined: <b>{user_db.joined_date}</b>", parse_mode="html")
+    await bot.send_message(ADMIN_ID,
+                           f"Пользователь найден! <b>@{(await bot.get_chat(user_db.tg_id)).username} "
+                           f"(<code>{user_db.tg_id}</code>)</b>\n"
+                           f"name: {(await bot.get_chat(user_db.tg_id)).first_name}\n"
+                           f"surname: {(await bot.get_chat(user_db.tg_id)).last_name}\n"
+                           f"bio: {(await bot.get_chat(user_db.tg_id)).bio}\n"
+                           f"is admin: <b>{user_db.is_admin}</b>\n"
+                           f"code id: <b>{user_db.code_id}</b>\n"
+                           f"score: <b>{user_db.score}</b>\n"
+                           f"joined: <b>{user_db.joined_date}</b>", parse_mode="html")
     await bot.send_message(ADMIN_ID, await bot.get_chat(user_db.tg_id))
 
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=['send'])
 async def send(message):
     try:
-        receiver = str(int(message.text.split()[1]))
+        receiver = message.text.split()[1]
         message = " ".join(message.text.split()[2:])
     except (IndexError, ValueError):
         await bot.send_message(ADMIN_ID, "Неверный формат! Напишите так: /send receiver_tg_id message")
-        admin_users_logger.info("Неверный формат! Напишите так: /send receiver_tg_id message")
+        admin_users_logger.debug("Неверный формат! Напишите так: /send receiver_tg_id message")
         return
     session = db_session.create_session()
-    user_db = session.query(User).filter(User.tg_id == receiver).first()
-    if not user_db:
+    if receiver == "all":
+        receivers = session.query(User).all()
+    elif receiver == "admins":
+        receivers = session.query(User).filter(User.is_admin == True).all()
+    else:
+        try:
+            receiver = str(int(receiver))
+        except ValueError:
+            await bot.send_message(ADMIN_ID, "Неверный формат! Напишите так: /send receiver_tg_id message")
+            admin_users_logger.debug("Неверный формат! Напишите так: /send receiver_tg_id message")
+            return
+        receivers = [session.query(User).filter(User.tg_id == receiver).first()]
+    if not receivers:
         await bot.send_message(ADMIN_ID, "Пользователь не найден в базе!")
-        admin_users_logger.info("Пользователь не найден в базе!")
+        admin_users_logger.debug("Пользователь не найден в базе!")
         return
-    try:
-        await bot.send_message(receiver, message)
-    except Exception as e:
-        await bot.send_message(ADMIN_ID, f"Не удалось отправить сообщение адресату. {e}")
-        admin_users_logger.error(f"Не удалось отправить сообщение адресату. {e}")
-        return
-    await bot.send_message(ADMIN_ID, "Сообщение успешно отправлено!")
-    admin_users_logger.info(f"Сообщение успешно отправлено {receiver}! msg: {message}")
+    for receiver in receivers:
+        try:
+            await bot.send_message(receiver.tg_id, message)
+        except Exception as e:
+            await bot.send_message(ADMIN_ID, f"Не удалось отправить сообщение адресату. {e}")
+            admin_users_logger.error(f"Не удалось отправить сообщение адресату. {e}")
+            return
+    await bot.send_message(ADMIN_ID, "Сообщения успешно отправлены!")
+    admin_users_logger.info(f"Сообщения успешно отправлены {str(receivers)}! msg: {message}")
 
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=['add_score'])

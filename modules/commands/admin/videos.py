@@ -23,12 +23,13 @@ async def get_user_videos(message):
         order_by(Video.used.desc()).all()
     data = str()
     for video in videos:
-        data += f"<b>{video.id}. {video.title}</b> (использовалось {video.used} раз)," \
-                f" {'активно' if video.active else 'неактивно'}, " \
+        data += f"<b>{video.id}. {video.title}</b> (использовалось {video.used} раз), " \
+                f"{'активно' if video.active else 'неактивно'}, " \
                 f"{len(video.actors)} актёров, {len(video.tags)} тегов, " \
                 f"загружено {video.created_date}.\n\n"
-    await bot.send_message(message.from_user.id, f"Загруженные этим пользователем видео:\n\n"
-                                           f"{data}", parse_mode="html")
+    await bot.send_message(message.from_user.id,
+                           f"Загруженные этим пользователем видео:\n\n"
+                           f"{data}", parse_mode="html")
 
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=["edit_title"])

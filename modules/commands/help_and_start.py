@@ -50,7 +50,10 @@ async def help_all(message):
            f"<b>/top</b> — ТОП самых активных пользователей и Ваш рейтинг\n\n" \
            f"<b>/articles</b> — Список статей о боте. Там можно узнать лайфхаки, " \
            f"о которых знают пока немногие\n" \
-           f"<b>/help</b> — Эта страница.\n\n" \
+           f"<b>/help</b> — Эта страница.\n" \
+           f"\n" \
+           f"<i>Бот пока работает в тестовом режиме. " \
+           f"Если что-то не работает — не пугайтесь, пишите мне!</i>\n\n" \
            f"По любым вопросам можете писать @{ADMIN_USERNAME}. С удовольствием отвечу =)"
     await bot.send_message(message.from_user.id, text, parse_mode="html")
 
@@ -74,10 +77,11 @@ async def start(message):
                 if code.isnumeric():
                     user_db = session.query(User).filter(User.tg_id == int(code)).first()
                     if user_db:
-                        await bot.send_message(user_db.tg_id, f"@{message.from_user.username} ({message.from_user.id}) "
-                                                        f"воспользовался "
-                                                        f"Вашим реферальным кодом "
-                                                        f"и присоединился.", disable_notification=True)
+                        await bot.send_message(user_db.tg_id,
+                                               f"@{message.from_user.username} ({message.from_user.id}) "
+                                               f"воспользовался "
+                                               f"Вашим реферальным кодом "
+                                               f"и присоединился.", disable_notification=True)
                         user_db.score += 100
                     else:
                         help_and_start_logger.warn(f"Пользователь, чей существующий в базе реферальный код был "
@@ -88,9 +92,10 @@ async def start(message):
                 session.commit()
                 help_and_start_logger.info(f"Зарегистрирован новый пользователь по pr-коду {code_db.title}! "
                                            f"{new_user.username} ({new_user.tg_id})")
-                await bot.send_message(ADMIN_ID, f"@{message.from_user.username} ({message.from_user.id}) "
-                                           f"воспользовался кодом "
-                                           f"{code_db.title} и присоединился.", disable_notification=True)
+                await bot.send_message(ADMIN_ID,
+                                       f"@{message.from_user.username} ({message.from_user.id}) "
+                                       f"воспользовался кодом "
+                                       f"{code_db.title} и присоединился.", disable_notification=True)
             elif code.isnumeric():
                 user_db = session.query(User).filter(User.tg_id == int(code)).first()
                 if user_db:
@@ -106,14 +111,16 @@ async def start(message):
                                     code_id=new_code.id)
                     session.add(new_user)
                     session.commit()
-                    await bot.send_message(user_db.tg_id, f"@{message.from_user.username} ({message.from_user.id}) "
-                                                    f"воспользовался Вашим "
-                                                    f"реферальным кодом "
-                                                    f"и присоединился.", disable_notification=True)
-                    await bot.send_message(ADMIN_ID, f"@{message.from_user.username} ({message.from_user.id}) ВПЕРВЫЕ "
-                                               f"воспользовался реферальным "
-                                               f"кодом @{user_db.username} ({user_db.tg_id}) и присоединился.",
-                                     disable_notification=True)
+                    await bot.send_message(user_db.tg_id,
+                                           f"@{message.from_user.username} ({message.from_user.id}) "
+                                           f"воспользовался Вашим "
+                                           f"реферальным кодом "
+                                           f"и присоединился.", disable_notification=True)
+                    await bot.send_message(ADMIN_ID,
+                                           f"@{message.from_user.username} ({message.from_user.id}) ВПЕРВЫЕ "
+                                           f"воспользовался реферальным "
+                                           f"кодом @{user_db.username} ({user_db.tg_id}) и присоединился.",
+                                           disable_notification=True)
                     help_and_start_logger.info(f"@{message.from_user.username} ({message.from_user.id}) ВПЕРВЫЕ "
                                                f"воспользовался кодом "
                                                f"{code_db.title} и присоединился.")
@@ -135,27 +142,31 @@ async def start(message):
         try:
             code = params[1]
         except IndexError:
-            await bot.send_message(message.from_user.id, f"Ссылка для получения прав админа устарела. Пожалуйста, "
-                                                   f"обратитесь к @{ADMIN_USERNAME}")
+            await bot.send_message(message.from_user.id,
+                                   f"Ссылка для получения прав админа устарела. Пожалуйста, "
+                                   f"обратитесь к @{ADMIN_USERNAME}")
             help_and_start_logger.warn(f"Ссылка для получения прав админа устарела. Сообщение: {message.text}")
             return
         code_db = session.query(Code).filter(Code.code == code, Code.type == 1).first()
         if code_db:
             user.is_admin = True
-            await bot.send_message(message.from_user.id, "Здравствуйте! Теперь Вы админ и можете загружать видео в базу "
-                             "бота без дополнительной проверки!) Чтобы узнать подробнее про бота "
-                             "и посмотреть список всех команд и возможностей, отправьте команду /help.")
-            await bot.send_message(ADMIN_ID, f"Теперь @{message.from_user.username} ({message.from_user.id}) "
-                                       f"админ. Была использована "
-                                       f"пригласительная ссылка {code_db.title}")
+            await bot.send_message(message.from_user.id,
+                                   "Здравствуйте! Теперь Вы админ и можете загружать видео в базу "
+                                   "бота без дополнительной проверки!) Чтобы узнать подробнее про бота "
+                                   "и посмотреть список всех команд и возможностей, отправьте команду /help.")
+            await bot.send_message(ADMIN_ID,
+                                   f"Теперь @{message.from_user.username} ({message.from_user.id}) "
+                                   f"админ. Была использована "
+                                   f"пригласительная ссылка {code_db.title}")
             help_and_start_logger.info(f"Теперь @{message.from_user.username} ({message.from_user.id}) "
                                        f"админ. Была использована "
                                        f"пригласительная ссылка {code_db.title}")
             session.delete(code_db)
             session.commit()
         else:
-            await bot.send_message(message.from_user.id, f"Ссылка для получения прав админа устарела. Пожалуйста, "
-                                                   f"обратитесь к @{ADMIN_USERNAME}")
+            await bot.send_message(message.from_user.id,
+                                   f"Ссылка для получения прав админа устарела. Пожалуйста, "
+                                   f"обратитесь к @{ADMIN_USERNAME}")
             help_and_start_logger.warn(f"Ссылка для получения прав админа устарела. Сообщение: {message.text}")
         return
     if not main_admin(message):

@@ -1,4 +1,4 @@
-from config import ADMIN_USERNAME, ADMIN_ID
+from config import ADMIN_USERNAME
 from modules.bot import bot, dp, Filter
 from modules.decorators import main_admin, admin
 from modules.logger import get_logger
@@ -20,23 +20,25 @@ text_field = ForceReply(selective=False)
 async def new_video_tags(message):
     tag = message.text
     if not tag:
-        await bot.send_message(message.from_user.id, f"Пожалуйста, введите тег текстом\n"
-                                               f"<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               f"Пожалуйста, введите тег текстом\n"
+                               f"<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               parse_mode="html", disable_web_page_preview=True)
         logger.info("Тег не указан")
         return
     elif len(tag) >= 50:
-        await bot.send_message(message.from_user.id, f"Тег слишком длинный (больше 50 символов). Пожалуйста, "
-                                               f"разбейте его на более короткие. "
-                                               f"Если что-то не так, пишите @{ADMIN_USERNAME}\n\n"
-                                               f"<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               f"Тег слишком длинный (больше 50 символов). Пожалуйста, "
+                               f"разбейте его на более короткие. "
+                               f"Если что-то не так, пишите @{ADMIN_USERNAME}\n\n"
+                               f"<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               parse_mode="html", disable_web_page_preview=True)
         logger.info("Тег слишком длинный (больше 50 символов)")
         return
     if tag != "Всё":
@@ -49,21 +51,23 @@ async def new_video_tags(message):
             session.add(Tag(tag=processed_tag, added_id=message.from_user.id, video_id=video.id,
                             coef=len(processed_tag.split()) * 3))
             session.commit()
-        await bot.send_message(message.from_user.id, f"{tag}, отлично. Что-то ещё?\n"
-                                               f"<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               f"{tag}, отлично. Что-то ещё?\n"
+                               f"<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               parse_mode="html", disable_web_page_preview=True)
     else:
         markup = ReplyKeyboardRemove(selective=False)
         session = db_session.create_session()
         video = session.query(Video).filter(Video.author_id == message.from_user.id,
                                             Video.last_edited == True).first()
         tags = [i.tag for i in video.tags]
-        await bot.send_message(message.from_user.id, "Отлично! Видео сохранено с тегами: " + ", ".join(tags) +
-                         "\n\n<i>(Название и описание тоже преобразуются в теги)</i>",
-                         reply_markup=markup, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Отлично! Видео сохранено с тегами: " + ", ".join(tags) +
+                               "\n\n<i>(Название и описание тоже преобразуются в теги)</i>",
+                               reply_markup=markup, parse_mode="html", disable_web_page_preview=True)
         video_id = video.id
         await bot.send_message(message.from_user.id, "Видео сохранено под id: " + str(video_id))
         change_state(message)

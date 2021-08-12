@@ -35,34 +35,37 @@ async def new_video_description(message):
                 session.commit()
         markup = ReplyKeyboardMarkup()
         markup.add(*ACTORS + ["Всё"])
-        await bot.send_message(message.from_user.id, "Если в видео фигурируют <b>конкретные личности, актёры</b>, "
-                                               "нажимайте на <b>кнопки с их именами</b>.\n"
-                                               "Если их нет на кнопках, введите полное имя и фамилию. "
-                                               "<b>Один человек — одно сообщение</b>.\n\n"
-                                               "Как только Вы захотите завершить ввод, нажмите <b>\"Всё\"</b>. "
-                                               "<b>Пожалуйста, после каждого сообщения дожидайтесь ответа, "
-                                               "иначе что-то может не сохраниться.</b>\n\n"
-                                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         reply_markup=markup, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Если в видео фигурируют <b>конкретные личности, актёры</b>, "
+                               "нажимайте на <b>кнопки с их именами</b>.\n"
+                               "Если их нет на кнопках, введите полное имя и фамилию. "
+                               "<b>Один человек — одно сообщение</b>.\n\n"
+                               "Как только Вы захотите завершить ввод, нажмите <b>\"Всё\"</b>. "
+                               "<b>Пожалуйста, после каждого сообщения дожидайтесь ответа, "
+                               "иначе что-то может не сохраниться.</b>\n\n"
+                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               reply_markup=markup, parse_mode="html", disable_web_page_preview=True)
         change_state(message, NEW_VIDEO_ACTORS_STATE)
     elif description != "":
-        await bot.send_message(message.from_user.id, "Слишком длинное описание (более 5000 символов). "
-                                               "Пожалуйста, попробуйте что-то покороче.\n\n"
-                                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Слишком длинное описание (более 5000 символов). "
+                               "Пожалуйста, попробуйте что-то покороче.\n\n"
+                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
         logger.info("Слишком длинное описание")
         return
     else:
-        await bot.send_message(message.from_user.id, "Вы ничего не написали. Пожалуйста, придумайте описание\n\n"
-                                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
-                                               "i-uvelichivat-ih-prosmotry-07-03\">"
-                                               "Советы по оформлению ролика</a>\n"
-                                               "/cancel для отмены загрузки и удаления ролика</i>",
-                         reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
+        await bot.send_message(message.from_user.id,
+                               "Вы ничего не написали. Пожалуйста, придумайте описание\n\n"
+                               "<i><a href=\"https://telegra.ph/Kak-zagruzhat-video-v-bazu-bota-"
+                               "i-uvelichivat-ih-prosmotry-07-03\">"
+                               "Советы по оформлению ролика</a>\n"
+                               "/cancel для отмены загрузки и удаления ролика</i>",
+                               reply_markup=text_field, parse_mode="html", disable_web_page_preview=True)
         logger.info("Описание не указано")

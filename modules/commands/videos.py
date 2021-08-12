@@ -17,10 +17,10 @@ async def random_video(message):
     if not video:
         videos_logger.critical(f"Рандомное видео не найдено!!!")
     await bot.send_video(message.from_user.id, video.url,
-                   caption=f"<b>{video.title}</b>\n"
-                           f"{video.description}\n\n"
-                           f"<i>{video.actors}</i>",
-                   parse_mode="html")
+                         caption=f"<b>{video.title}</b>\n"
+                                 f"{video.description}\n\n"
+                                 f"<i>{video.actors}</i>",
+                         parse_mode="html")
 
 
 @dp.message_handler(commands=['id'])
@@ -41,7 +41,7 @@ async def send_by_id(message, full):
                                             Video.active == True).first()
     except IndexError:
         await bot.send_message(message.from_user.id, f"Неверный формат ввода! Введите в формате: /{command} n, "
-                                               f"где n — id видео")
+                                                     f"где n — id видео")
         videos_logger.info(f"Неверный формат ввода для команды {command}!")
         return
     if not video:
@@ -50,9 +50,19 @@ async def send_by_id(message, full):
         return
     text = f"<b>{video.title}</b>\n{video.description}\n\n<i>{video.actors}" \
            f"<b>{video.tags if main_admin(message) else ''}</b></i>" if full else None
+    if not text:
+        await bot.send_video(message.from_user.id, video.url,
+                             parse_mode="html")
+        return
+    if len(text) > 1024:
+        await bot.send_video(message.from_user.id, video.url,
+                             parse_mode="html")
+        await bot.send_message(message.from_user.id, text,
+                               parse_mode="html")
+        return
     await bot.send_video(message.from_user.id, video.url,
-                   caption=text,
-                   parse_mode="html")
+                         caption=text,
+                         parse_mode="html")
 
 
 @dp.message_handler(commands=["search"])
@@ -66,6 +76,8 @@ async def search_cmd(message):
         for res in rev_res[rating]:
             video = session.query(Video).filter(Video.id == res).first()
             if video:
+                if len(out) == 10:
+                    break
                 out.append(f"{video.id}. {video.title}\n"
                            f"<i>{video.description}\n"
                            f"{video.actors}</i>\n\n")
@@ -129,4 +141,4 @@ async def get_videos_page(message, chat, full):
     key.add(next_btn)
     await bot.send_message(chat, f"Страница {page}:\n"
                            f"{data}",
-                     parse_mode="html", reply_markup=key)
+                           parse_mode="html", reply_markup=key)
