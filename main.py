@@ -7,6 +7,7 @@ from aiogram import executor
 import asyncio
 import logging
 
+
 logger = get_logger("main")
 logger.info("БОТ ЗАПУЩЕН")
 
