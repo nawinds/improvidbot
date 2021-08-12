@@ -1,8 +1,8 @@
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.decorators import main_admin
 
 
-@dp.message_handler(commands=["help"], function=lambda message: main_admin(message))
+@dp.message_handler(Filter(lambda message: main_admin(message)), commands=["help"])
 async def help_admin(message):
     text = f"<b>ОБЩИЕ:</b>\n" \
            f"<b>/search q</b> — Поиск видео, где q — поисковый запрос\n" \
@@ -46,4 +46,4 @@ async def help_admin(message):
            f"<b>/delete_all_tags id</b> — Удаление всех тегов\n" \
            f"<b>/add_tag id tag</b> — Добавление нового тега\n\n" \
            f"<b>/help</b> — Эта страница."
-    bot.send_message(message.from_user.id, text, parse_mode="html")
+    await bot.send_message(message.from_user.id, text, parse_mode="html")

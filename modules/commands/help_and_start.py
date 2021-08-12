@@ -1,5 +1,5 @@
 from config import ADMIN_ID,  ADMIN_USERNAME
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.logger import get_logger
 from modules.commands.admin.help_admin import help_admin
 from modules.decorators import main_admin
@@ -10,7 +10,7 @@ from db.codes import Code
 help_and_start_logger = get_logger("help_and_start_commands")
 
 
-@dp.message_handler(commands=["help"], function=lambda message: not main_admin(message))
+@dp.message_handler(Filter(lambda message: not main_admin(message)), commands=["help"])
 async def help_all(message):
     text = f"Привет, {message.from_user.first_name}!\n" \
            f"Это бот, который умеет находить небольшие видео из выпусков и выступлений шоу \"Импровизация\".\n\n" \
@@ -161,7 +161,7 @@ async def start(message):
     if not main_admin(message):
         await help_all(message)
     else:
-        help_admin(message)
+        await help_admin(message)
 
 
 @dp.message_handler(commands=["articles"])

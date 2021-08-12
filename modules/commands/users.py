@@ -16,14 +16,14 @@ async def top(message):
     all_users = session.query(User).order_by(User.score.desc()).all()
     top_users = all_users[:10]
     data = [f"{user + 1}. <b>{top_users[user].score}</b> "
-            f"<a href=\"t.me/{await bot.get_chat(top_users[user].tg_id).username}\">"
-            f"{await bot.get_chat(top_users[user].tg_id).first_name} "
-            f"{await bot.get_chat(top_users[user].tg_id).last_name if await bot.get_chat(top_users[user].tg_id).last_name else ''}"
-            f"</a>" if await bot.get_chat(top_users[user].tg_id).username else
+            f"<a href=\"t.me/{(await bot.get_chat(top_users[user].tg_id)).username}\">"
+            f"{(await bot.get_chat(top_users[user].tg_id)).first_name} "
+            f"{(await bot.get_chat(top_users[user].tg_id)).last_name if (await bot.get_chat(top_users[user].tg_id)).last_name else ''}"
+            f"</a>" if (await bot.get_chat(top_users[user].tg_id)).username else
 
             f"{user + 1}. <b>{top_users[user].score}</b> "
-            f"{await bot.get_chat(top_users[user].tg_id).first_name} "
-            f"{await bot.get_chat(top_users[user].tg_id).last_name if await bot.get_chat(top_users[user].tg_id).last_name else ''}"
+            f"{(await bot.get_chat(top_users[user].tg_id)).first_name} "
+            f"{(await bot.get_chat(top_users[user].tg_id)).last_name if (await bot.get_chat(top_users[user].tg_id)).last_name else ''}"
             for user in range(len(top_users))]
     places_emojis = ["🥇", "🥈", "🥉"]
     for i in range(3):

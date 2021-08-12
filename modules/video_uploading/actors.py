@@ -1,5 +1,5 @@
 from config import ADMIN_USERNAME, WHITE_SYMBOLS
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.text_func import normalize
 from modules.states import get_state, change_state
 from modules.logger import get_logger
@@ -14,7 +14,7 @@ logger = get_logger("new_video_actors")
 text_field = ForceReply(selective=False)
 
 
-@dp.message_handler(function=lambda message: get_state(message) == NEW_VIDEO_ACTORS_STATE)
+@dp.message_handler(Filter(lambda message: get_state(message) == NEW_VIDEO_ACTORS_STATE))
 async def new_video_actors(message):
     actor = message.text
     if actor == "Всё":

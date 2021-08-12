@@ -1,3 +1,5 @@
+from abc import ABC
+
 from config import TOKEN
 from modules.logger import get_logger
 import aiogram
@@ -42,7 +44,16 @@ class Dispatcher(aiogram.Dispatcher):
             if err:
                 return err
             raise
-        return await super().process_update(update)
+        res = await super().process_update(update)
+        return res
+
+
+class Filter(aiogram.dispatcher.filters.filters.Filter, ABC):
+    def __init__(self, func):
+        self.func = func
+
+    async def check(self, *args) -> bool:
+        return self.func(*args)
 
 
 bot = Bot(TOKEN)

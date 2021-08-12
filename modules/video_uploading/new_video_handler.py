@@ -1,6 +1,6 @@
 from config import ADMIN_USERNAME
 from config import ADMIN_ID
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.states import get_state, change_state
 from modules.decorators import main_admin
 from modules.logger import get_logger
@@ -15,7 +15,7 @@ logger = get_logger("new_video_handler")
 text_field = ForceReply(selective=False)
 
 
-@dp.message_handler(content_types=["video"], function=lambda m: get_state(m) is None)
+@dp.message_handler(Filter(lambda m: get_state(m) is None), content_types=["video"])
 async def new_video(message):
     if message.video.duration > 60 and not main_admin(message):
         await bot.send_message(message.from_user.id, f"Длина видео превышает 1 минуту! Обычно видео такой длины "
@@ -69,8 +69,8 @@ async def new_video(message):
         change_state(message, NEW_VIDEO_TITLE_STATE)
 
 
-@dp.message_handler(commands=["cancel"], function=lambda message: get_state(message) in [NEW_VIDEO_TITLE_STATE,
-                    NEW_VIDEO_DESCRIPTION_STATE, NEW_VIDEO_TAGS_STATE, NEW_VIDEO_ACTORS_STATE])
+@dp.message_handler(Filter(lambda message: get_state(message) in [NEW_VIDEO_TITLE_STATE,
+                    NEW_VIDEO_DESCRIPTION_STATE, NEW_VIDEO_TAGS_STATE, NEW_VIDEO_ACTORS_STATE]), commands=["cancel"])
 async def cancel_uploading(message):
     session = db_session.create_session()
     video = session.query(Video).filter(Video.author_id == message.from_user.id,

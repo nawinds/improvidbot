@@ -1,4 +1,4 @@
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.commands.videos import get_videos_page
 from modules.logger import get_logger
 from modules.scores import add_score
@@ -8,8 +8,8 @@ from db.videos import Video
 logger = get_logger("callback")
 
 
-@dp.callback_query_handler(function=lambda c: c.data.split("-")[0] in ("accept", "cancel", "title",
-                                                                       "description", "tags", "actors"))
+@dp.callback_query_handler(Filter(lambda c: c.data.split("-")[0] in ("accept", "cancel", "title",
+                                                                     "description", "tags", "actors")))
 async def inline_buttons(c):
     command, video_id = c.data.split("-")
     session = db_session.create_session()
@@ -35,10 +35,10 @@ async def inline_buttons(c):
         logger.info(f"Видео {video_id} отклонено")
 
 
-@dp.callback_query_handler(function=lambda c: c.data.split("-")[0] in ("fullpage", "page"))
+@dp.callback_query_handler(Filter(lambda c: c.data.split("-")[0] in ("fullpage", "page")))
 async def inline_buttons(c):
     command, page = c.data.split("-")
     if command == "fullpage":
-        get_videos_page(f"callback {page}", c.from_user.id, True)
+        await get_videos_page(f"callback {page}", c.from_user.id, True)
     elif command == "page":
-        get_videos_page(f"callback {page}", c.from_user.id, False)
+        await get_videos_page(f"callback {page}", c.from_user.id, False)

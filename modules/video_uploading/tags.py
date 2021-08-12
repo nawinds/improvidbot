@@ -1,10 +1,9 @@
 from config import ADMIN_USERNAME, ADMIN_ID
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.decorators import main_admin, admin
 from modules.logger import get_logger
 from modules.text_func import normalize
 from modules.states import get_state, change_state
-from modules.video_uploading.repeats_search import check_repeats
 from modules.video_uploading.new_video_handler import new_video_notify
 from modules.scores import add_score
 from db import db_session
@@ -17,7 +16,7 @@ logger = get_logger("new_video_tags")
 text_field = ForceReply(selective=False)
 
 
-@dp.message_handler(function=lambda message: get_state(message) == NEW_VIDEO_TAGS_STATE)
+@dp.message_handler(Filter(lambda message: get_state(message) == NEW_VIDEO_TAGS_STATE))
 async def new_video_tags(message):
     tag = message.text
     if not tag:
@@ -72,16 +71,7 @@ async def new_video_tags(message):
             video.active = True
             add_score(message.from_user.id, 200)
             if not main_admin(message):
-                new_video_notify(video_id, False)
+                await new_video_notify(video_id, False)
             session.commit()
         else:
-            new_video_notify(video_id, True)
-        rep = check_repeats(video)
-        if rep:
-            await bot.send_message(ADMIN_ID, f"Видео {video.id} содержит кадры из "
-                                       f"видео {', '.join([str(i.id) for i in rep])}!")
-            await bot.send_video(ADMIN_ID, video.url, caption=str(video.id))
-            for i in rep:
-                await bot.send_video(ADMIN_ID, i.url, caption=str(i.id))
-        else:
-            await bot.send_message(ADMIN_ID, f"Видео {video.id} проверено, повторов нет")
+            await new_video_notify(video_id, True)

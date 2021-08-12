@@ -1,4 +1,4 @@
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.logger import get_logger
 from modules.text_func import get_text_variants
 from modules.states import get_state, change_state
@@ -12,7 +12,7 @@ logger = get_logger("new_video_title")
 text_field = ForceReply(selective=False)
 
 
-@dp.message_handler(function=lambda message: get_state(message) == NEW_VIDEO_TITLE_STATE)
+@dp.message_handler(Filter(lambda message: get_state(message) == NEW_VIDEO_TITLE_STATE))
 async def new_video_title(message):
     title = message.text
     if title and len(title) <= 100:

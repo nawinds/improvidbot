@@ -1,13 +1,13 @@
 from modules.logger import get_logger
 from modules.text_func import get_text_variants
-from modules.bot import bot, dp
+from modules.bot import bot, dp, Filter
 from modules.scores import add_score
 from db import db_session
 from db.videos import Video
 from db.video_actors import Actor
 from db.tags import Tag
 from db.stats import Stats
-from telebot.types import ForceReply, InlineQueryResultVideo
+from aiogram.types import ForceReply, InlineQueryResultVideo
 import difflib
 import time
 import pymorphy2
@@ -92,7 +92,7 @@ def find_result(q, results):
     return results
 
 
-@dp.inline_handler(function=lambda query: True)
+@dp.inline_handler(Filter(lambda query: True))
 async def query_text(inline_query):
     session = db_session.create_session()
     all_queries = session.query(Stats).filter(Stats.title == "all_queries").first()
@@ -106,8 +106,9 @@ async def query_text(inline_query):
         for res in rev_res[rating]:
             video = session.query(Video).filter(Video.id == res).first()
             if video:
-                out.append(InlineQueryResultVideo(video.id, video.url, "video/mp4", video.thumb_url,
-                                                  f"{video.title}",
+                out.append(InlineQueryResultVideo(id=video.id, video_url=video.url, mime_type="video/mp4",
+                                                  thumb_url=video.thumb_url,
+                                                  title=f"{video.title}",
                                                   description=f"{video.id}.{video.description} {video.actors}"))
             else:
                 logger.error(f"Видео {res} не найдено при выполнении поиска")
@@ -126,8 +127,8 @@ async def query_text(inline_query):
     await bot.answer_inline_query(inline_query.id, out, cache_time=10)
 
 
-@dp.chosen_inline_handler(function=lambda chosen_inline_result: True)
-def test_chosen(chosen_inline_result):
+@dp.chosen_inline_handler(Filter(lambda chosen_inline_result: True))
+async def test_chosen(chosen_inline_result):
     logger.debug(f"Пользователь {chosen_inline_result.from_user.id} выбрал видео "
                  f"id {chosen_inline_result.result_id} по инлайн-запросу {chosen_inline_result.query}")
     session = db_session.create_session()
