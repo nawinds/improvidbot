@@ -8,6 +8,7 @@ LOGGER_TOKEN = os.getenv("LOGGER_TOKEN")
 LOCAL_PATH = os.getenv("LOCAL_PATH")
 DB_PATH = f"{LOCAL_PATH}/db/main.db"
 LOGS_PATH = f"{LOCAL_PATH}/logs/main.log"
+AIOGRAM_LOGS_PATH = f"{LOCAL_PATH}/logs/aiogram.log"
 ACTORS = ["Антон Шастун", "Арсений Попов", "Сергей Матвиенко", "Дмитрий Позов",
           "Павел Воля", "Станислав Шеминов", "Оксана Суркова"]
 ALIASES = {"Антон Шастун": ["Шастун", "Шаст", "Антон", "Тоша", "Антоха", "Артон", "Артоны", "Антох",
@@ -20,6 +21,8 @@ ALIASES = {"Антон Шастун": ["Шастун", "Шаст", "Антон",
            "Станислав Шеминов": ["Стас", "Станислав", "Шеминов", "Стасик"],
            "Оксана Суркова": ["Оксана", "Суркова", "Окси", "Оксан", "Оксанка"],
            "Импровизация": ["импра", "импровизации"]}
-WHITE_SYMBOLS = list("0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNMёйцукенгшщзхъфывапролджэячсмитьбю"
+WHITE_SYMBOLS = list("0123456789"
+                     "qwertyuiopasdfghjklzxcvbnm"
+                     "QWERTYUIOPASDFGHJKLZXCVBNM"
+                     "ёйцукенгшщзхъфывапролджэячсмитьбю"
                      "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ ")
-

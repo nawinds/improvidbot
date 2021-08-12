@@ -1,5 +1,5 @@
 from config import ADMIN_ID
-from modules.bot import bot
+from modules.bot import bot, dp, Filter
 from modules.logger import get_logger
 from modules.states import change_state, get_state
 from modules.commands.admin.codes.new_code_title import new_code_title
@@ -13,8 +13,8 @@ import string
 admin_codes_logger = get_logger("admin_codes_commands")
 
 
-@bot.message_handler(commands=["new_admin_code"], func=lambda message: main_admin(message))
-def new_admin_code(message):
+@dp.message_handler(Filter(lambda message: main_admin(message)), commands=["new_admin_code"])
+async def new_admin_code(message):
     letters = string.ascii_lowercase
     session = db_session.create_session()
     code_db = True
@@ -24,25 +24,26 @@ def new_admin_code(message):
     session.add(Code(code=code, type=1))
     session.commit()
     code_db = session.query(Code).filter(Code.code == code, Code.type == 1).first()
-    bot.send_message(ADMIN_ID, f"Новый админ-код с id: {code_db.id}. Придумайте ему название: {code_db.id}. Название")
+    await bot.send_message(ADMIN_ID, f"Новый админ-код с id: {code_db.id}. Придумайте ему "
+                                     f"название: {code_db.id}. Название")
     admin_codes_logger.info(f"Новый админ-код с id: {code_db.id}")
     change_state(message, NEW_ADMIN_CODE_TITLE_STATE)
 
 
-@bot.message_handler(commands=["edit_admin_title"], func=lambda m: main_admin(m))
-def edit_admin_title(message):
-    new_code_title(message, " ".join(message.text.split()[1:]), 'admininvite')
+@dp.message_handler(Filter(lambda m: main_admin(m)), commands=["edit_admin_title"])
+async def edit_admin_title(message):
+    await new_code_title(message, " ".join(message.text.split()[1:]), 'admininvite')
 
 
-@bot.message_handler(content_types=["text"], func=lambda m: get_state(m) == NEW_ADMIN_CODE_TITLE_STATE)
-def new_admin_code_title(message):
-    new_code_title(message, message.text, 'admininvite')
+@dp.message_handler(Filter(lambda m: get_state(m) == NEW_ADMIN_CODE_TITLE_STATE), content_types=["text"])
+async def new_admin_code_title(message):
+    await new_code_title(message, message.text, 'admininvite')
 
 
-@bot.message_handler(commands=["all_admin_codes"], func=lambda message: main_admin(message))
-def all_admin_codes(message):
+@dp.message_handler(Filter(lambda message: main_admin(message)), commands=["all_admin_codes"])
+async def all_admin_codes(message):
     session = db_session.create_session()
     codes = session.query(Code).filter(Code.type == 1).all()
     data = '\n\n'.join([f'{code.id}. {code.title}' for code in codes])
     text = f"Список пригласительных кодов админов:\n{data}"
-    bot.send_message(ADMIN_ID, text)
+    await bot.send_message(ADMIN_ID, text)
