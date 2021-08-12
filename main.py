@@ -8,7 +8,6 @@ from modules.logger import get_logger
 from db import db_session
 
 
-
 logger = get_logger("main")
 logger.info("БОТ ЗАПУЩЕН")
 
