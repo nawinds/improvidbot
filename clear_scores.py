@@ -1,7 +1,7 @@
 #!/home/pi/venvs/improvidbot/bin/python3
-from db.db_session import global_init, create_session
-import config
 import asyncio
+import config
+from db.db_session import global_init, create_session
 from db.users import User
 from modules.bot import bot
 

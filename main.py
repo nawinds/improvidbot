@@ -1,11 +1,12 @@
 #!/home/pi/venvs/improvidbot/bin/python3
+import asyncio
+import logging
+from aiogram import executor
 from config import DB_PATH, AIOGRAM_LOGS_PATH
 from modules.bot import dp
 from modules.logger import get_logger
 from db import db_session
-from aiogram import executor
-import asyncio
-import logging
+
 
 logger = get_logger("main")
 logger.info("БОТ ЗАПУЩЕН")
