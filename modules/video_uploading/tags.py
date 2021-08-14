@@ -63,13 +63,9 @@ async def new_video_tags(message):
         session = db_session.create_session()
         video = session.query(Video).filter(Video.author_id == message.from_user.id,
                                             Video.last_edited == True).first()
-        tags = [i.tag for i in video.tags]
-        await bot.send_message(message.from_user.id,
-                               "Отлично! Видео сохранено с тегами: " + ", ".join(tags) +
-                               "\n\n<i>(Название и описание тоже преобразуются в теги)</i>",
-                               reply_markup=markup, parse_mode="html", disable_web_page_preview=True)
         video_id = video.id
-        await bot.send_message(message.from_user.id, "Видео сохранено под id: " + str(video_id))
+        await bot.send_message(message.from_user.id, "Отлично! Видео сохранено под id: " + str(video_id),
+                               reply_markup=markup)
         change_state(message)
         if admin(message):
             video.active = True

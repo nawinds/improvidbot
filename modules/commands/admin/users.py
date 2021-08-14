@@ -9,8 +9,51 @@ from db.users import User
 admin_users_logger = get_logger("admin_users_commands")
 
 
+@dp.message_handler(Filter(lambda message: main_admin(message)), commands=["all_users"])
+async def all_users(message):
+    try:
+        page = int(message.split()[1])
+    except IndexError:
+        page = 1
+    except ValueError:
+        message.reply("Неверный формат! Введите так: /all_users <page>")
+        return
+    if page < 1:
+        await bot.send_message(message.from_user.id, f"Такой страницы не существует!"
+                                                     f" Нумерация страниц начинается с 1")
+        return
+    session = db_session.create_session()
+    users = session.query(User).all()
+    data = '\n\n'.join([f'@{(await bot.get_chat(user.tg_id)).username}\n'
+                        f'id: <code>{user.tg_id}</code>\n'
+                        f'is_admin: {user.is_admin}\n'
+                        f'name: {(await bot.get_chat(user.tg_id)).first_name}\n'
+                        f'surname: {(await bot.get_chat(user.tg_id)).last_name}\n'
+                        f'bio: {(await bot.get_chat(user.tg_id)).bio}\n'
+                        f'Счёт: {user.score}\n'
+                        f'Регистрация: {user.joined_date}' for user in users])
+    data = data[(page - 1) * 10:page * 10]
+    if not data:
+        await bot.send_message(message.from_user.id, f"На этой странице нет пользователей. "
+                                                     f"Попробуйте страницу с меньшим номером.", parse_mode="html")
+        return
+    text = f"Список пользователей (Страница {page}):\n\n{data}"
+    await bot.send_message(ADMIN_ID, text, parse_mode="html")
+
+
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=["all_admins"])
 async def all_admins(message):
+    try:
+        page = int(message.split()[1])
+    except IndexError:
+        page = 1
+    except ValueError:
+        message.reply("Неверный формат! Введите так: /all_admins <page>")
+        return
+    if page < 1:
+        await bot.send_message(message.from_user.id, f"Такой страницы не существует!"
+                                                     f" Нумерация страниц начинается с 1")
+        return
     session = db_session.create_session()
     admins = session.query(User).filter(User.is_admin == True).all()
     data = '\n\n'.join([f'@{(await bot.get_chat(admin.tg_id)).username}\n'
@@ -20,7 +63,12 @@ async def all_admins(message):
                         f'bio: {(await bot.get_chat(admin.tg_id)).bio}\n'
                         f'Счёт: {admin.score}\n'
                         f'Регистрация: {admin.joined_date}' for admin in admins])
-    text = f"Список админов:\n\n{data}"
+    data = data[(page - 1) * 10:page * 10]
+    if not data:
+        await bot.send_message(message.from_user.id, f"На этой странице нет пользователей. "
+                                                     f"Попробуйте страницу с меньшим номером.", parse_mode="html")
+        return
+    text = f"Список админов (Страница {page}):\n\n{data}"
     await bot.send_message(ADMIN_ID, text, parse_mode="html")
 
 
@@ -50,9 +98,9 @@ async def find_user(message):
         user = message.text.split()[1]
     except IndexError:
         await bot.send_message(ADMIN_ID,
-                               "Пожалуйста, укажите получателя в формате: /find_user @username или "
+                               "Пожалуйста, укажите пользователя в формате: /find_user @username или "
                                "/find_user tg_id")
-        admin_users_logger.info("Пожалуйста, укажите получателя в формате: /find_user @username или "
+        admin_users_logger.info("Пожалуйста, укажите пользователя в формате: /find_user @username или "
                                 "/find_user tg_id")
         return
     session = db_session.create_session()
@@ -70,8 +118,8 @@ async def find_user(message):
                            f"name: {(await bot.get_chat(user_db.tg_id)).first_name}\n"
                            f"surname: {(await bot.get_chat(user_db.tg_id)).last_name}\n"
                            f"bio: {(await bot.get_chat(user_db.tg_id)).bio}\n"
-                           f"is admin: <b>{user_db.is_admin}</b>\n"
-                           f"code id: <b>{user_db.code_id}</b>\n"
+                           f"is_admin: <b>{user_db.is_admin}</b>\n"
+                           f"code_id: <b>{user_db.code_id}</b>\n"
                            f"score: <b>{user_db.score}</b>\n"
                            f"joined: <b>{user_db.joined_date}</b>", parse_mode="html")
     await bot.send_message(ADMIN_ID, await bot.get_chat(user_db.tg_id))

@@ -105,10 +105,10 @@ async def new_video_notify(video_id, needs_confirmation):
     await bot.send_message(ADMIN_ID,
                            f"<b>Загружено новое видео!</b>\n"
                            f"<i>id</i>: <b>{video_id}</b>\n"
-                           f"<i>Название</i>: <b>{video.title}</b>\n"
-                           f"<i>Описание</i>: <b>{video.description}</b>\n"
-                           f"<i>Теги</i>: <b>{video.tags}</b>\n"
-                           f"<i>Актеры</i>: <b>{video.actors}</b>\n\n"
+                           f"<i>Название</i>: <b><code>{video.title}</code></b>\n"
+                           f"<i>Описание</i>: <b><code>{video.description}</code></b>\n"
+                           f"<i>Теги</i>: <b><code>{video.tags}</code</b>\n"
+                           f"<i>Актеры</i>: <b><code>{video.actors}</code></b>\n\n"
                            f"Загрузил @{author.username}", reply_markup=key,
                            parse_mode="html")
     await bot.send_video(ADMIN_ID, video.url)

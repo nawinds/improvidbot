@@ -7,6 +7,7 @@ import typing
 
 bot_logger = get_logger("bot")
 
+
 class Bot(aiogram.Bot):
     logger = bot_logger
 

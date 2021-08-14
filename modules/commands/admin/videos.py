@@ -14,13 +14,28 @@ admin_videos_logger = get_logger("admin_videos_commands")
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=['get_user_videos'])
 async def get_user_videos(message):
     try:
+        page = int(message.text.split()[1])
+    except IndexError:
+        page = 1
+    except ValueError:
+        await message.reply("Неверный формат команды! Введите: /get_user_videos <номер страницы>")
+        return
+    if page < 1:
+        await bot.send_message(message.from_user.id, f"Такой страницы не существует!"
+                                                     f" Нумерация страниц начинается с 1")
+        return
+    try:
         user_id = int(message.text.split()[1])
     except (IndexError, ValueError):
         await message.reply(f"Неверный формат! /get_user_videos <user_id>")
         return
     session = db_session.create_session()
     videos = session.query(Video).filter(Video.author_id == user_id). \
-        order_by(Video.used.desc()).all()
+        order_by(Video.used.desc()).all()[(page - 1) * 10:page * 10]
+    if not videos:
+        await bot.send_message(message.from_user.id, f"На этой странице нет видео. "
+                                                     f"Попробуйте страницу с меньшим номером.", parse_mode="html")
+        return
     data = str()
     for video in videos:
         data += f"<b>{video.id}. {video.title}</b> (использовалось {video.used} раз), " \
@@ -28,7 +43,7 @@ async def get_user_videos(message):
                 f"{len(video.actors)} актёров, {len(video.tags)} тегов, " \
                 f"загружено {video.created_date}.\n\n"
     await bot.send_message(message.from_user.id,
-                           f"Загруженные этим пользователем видео:\n\n"
+                           f"Загруженные этим пользователем видео (Страница {page}):\n\n"
                            f"{data}", parse_mode="html")
 
 
@@ -68,7 +83,13 @@ async def edit_title(vid_id, title):
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=["edit_description"])
 async def edit_description_cmd(message):
-    vid_id, description = message.text.split()[1], " ".join(message.text.split()[2:])
+    try:
+        vid_id, description = message.text.split()[1], " ".join(message.text.split()[2:])
+        if not description:
+            raise ValueError
+    except (IndexError, ValueError):
+        await message.reply("Неверный формат команды! Введите: /edit_description <id> <description>")
+        return
     await edit_description(vid_id, description)
 
 
@@ -96,7 +117,13 @@ async def edit_description(vid_id, description):
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=["edit_actors"])
 async def edit_actors_cmd(message):
-    vid_id, actors = message.text.split()[1], " ".join(message.text.split()[2:]).split(", ")
+    try:
+        vid_id, actors = message.text.split()[1], " ".join(message.text.split()[2:]).split(", ")
+        if not actors:
+            raise ValueError
+    except (IndexError, ValueError):
+        await message.reply("Неверный формат команды! Введите: /edit_actors <id> <actor>, <actor>, ...")
+        return
     await edit_actors(vid_id, actors)
 
 
@@ -134,13 +161,25 @@ async def edit_actors(vid_id, actors):
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=["delete_tag"])
 async def del_tag_cmd(message):
-    vid_id, tag = message.text.split()[1], " ".join(message.text.split()[2:])
+    try:
+        vid_id, tag = message.text.split()[1], " ".join(message.text.split()[2:])
+        if not tag:
+            raise ValueError
+    except (IndexError, ValueError):
+        await message.reply("Неверный формат команды! Введите: /delete_tag <id> <tag>")
+        return
     await del_tag(vid_id, tag)
 
 
 @dp.message_handler(Filter(lambda message: main_admin(message)), commands=["delete_all_tags"])
 async def del_all_tags_cmd(message):
-    vid_id = message.text.split()[1]
+    try:
+        vid_id = message.text.split()[1]
+        if not vid_id:
+            raise ValueError
+    except (IndexError, ValueError):
+        await message.reply("Неверный формат команды! Введите: /delete_all_tags <id>")
+        return
     await del_all_tags(vid_id)
 
 
